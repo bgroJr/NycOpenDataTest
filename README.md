@@ -17,34 +17,33 @@ for test projects in Python and JavaScript.
 ## Setup
 
 ```
-# Download the Kotlin Main KTS .jar file and put it in your working directory
-$ wget https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-main-kts/1.3.72/kotlin-main-kts-1.3.72.jar
+# on Mac OS, install Kotlin with Homebrew
+$ brew install kotlin
 ```
 
 ## Run
 ```
-# Make sure kotlin-main-kts-1.3.72.jar is in your current working directory
 $ kotlinc -script TestRunner.main.kts
 ```
 
 ## Tests
 
-The tests are defined in **NycOpenDataTest.kts**. The tests interact with the "Open Streets" dataset,
+The tests are defined in **NycOpenDataTest.kts**. The test methods make requests to the "Open Streets" dataset,
 tracking which streets are currently closed to car traffic, to allow for more space for walking.
 
 **TestRunner.main.kts** contains a minimal test runner using [JUnitCore](https://junit.org/junit4/javadoc/latest/org/junit/runner/JUnitCore.html).
-The file also contains special annotations like "@file:DependsOn" to specify 3rd-party dependencies and
+The file also contains special annotations like "@file:DependsOn" to specify 3rd-party dependencies, and
 import the other .kts script files together into a shared environment using "@file:Import".
 
-When you import a .kts script file with "@file:Import", the name of the file becomes the "package" for
+When you import a .kts script file with "@file:Import", the name of the file becomes the "package" namespace for
 the contents of the file:
 
 ```
 # Urls.kts
 object DepartmentOfBuildings {
-  ...
+  val API = ...
 }
-==============
+==============================
 # Runner.main.kts
 @file:Import("Urls.kts")
 Urls.DepartmentOfBuildings.API
@@ -56,7 +55,6 @@ Urls.DepartmentOfBuildings.API
 In order to use the conveniences offered by Kotlin scripting, at least one of the script files **must**
 have the file extension ".main.kts". This special extension signals to Kotlin to apply the 
 special scripting environment to the script. 
-
 
 ## Benefits
 
@@ -84,15 +82,10 @@ change the related code. The only work-around I have right now is to manually fi
 the cache location and delete the .jar of stale byte-code: 
 
 ```
-# open up Kotlin REPL to find temporary directory
+# open up Kotlin REPL to find temporary directory with cached .jar
 $ kotlin
 >>> val tmpdir = System.getProperty("java.io.tmpdir")
-    ...
->>> java.io.File(tmpdir).delete()
+>>> val paths = java.nio.file.Files.newDirectoryStream(tmpdir + "main.kts.compiled.cache", "*.jar")
+>>> paths.forEach { it.toFile().delete() }
 ```
-
-
-
-
-
 
